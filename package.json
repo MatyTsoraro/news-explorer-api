@@ -1,0 +1,22 @@
+{
+  "name": "news-explorer-api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "node index.js",
+    "start": "NODE_ENV=production node index.js"
+  },
+
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MatyTsoraro/news-explorer-api.git"
+  },
+  "author": "Maty Tsoraro",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/MatyTsoraro/news-explorer-api/issues"
+  },
+  "homepage": "https://github.com/MatyTsoraro/news-explorer-api#readme"
+}
