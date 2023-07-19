@@ -1,6 +1,4 @@
-// middlewares/authMiddleware.js
 const jwt = require('jsonwebtoken');
-const config = require('../config');
 
 const authMiddleware = (req, res, next) => {
   // Check if token exists in the request header
@@ -10,8 +8,10 @@ const authMiddleware = (req, res, next) => {
   }
 
   try {
-    // Verify and decode the token
-    const decoded = jwt.verify(token, config.jwtSecret);
+    const jwtSecret = process.env.JWT_SECRET;
+
+    // Verify and decode the token using the jwtSecret
+    const decoded = jwt.verify(token, jwtSecret);
 
     // Add the decoded user information to the request object
     req.user = decoded.user;
