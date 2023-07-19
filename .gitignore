@@ -1,13 +1,12 @@
 # Logs
-logs
+logs/
 *.log
-npm-debug.log*
 
 # Dependency directory
-node_modules
+node_modules/
 
 # Optional npm cache directory
-.npm
+.npm/
 
 # System files and IDE settings folders
 .DS_Store
