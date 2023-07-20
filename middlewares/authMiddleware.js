@@ -3,10 +3,15 @@ require('dotenv').config();
 
 const authMiddleware = (req, res, next) => {
   // Check if token exists in the request header
-  const token = req.header('Authorization');
-  if (!token) {
+  const authHeader = req.headers['authorization'];
+
+  // Check if Authorization header is present and in correct format
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
+
+  // Extract the token from the Authorization header
+  const token = authHeader.split(' ')[1];
 
   try {
     // Verify and decode the token using the jwtSecret
@@ -22,5 +27,6 @@ const authMiddleware = (req, res, next) => {
     res.status(401).json({ error: 'Unauthorized' });
   }
 };
+
 
 module.exports = authMiddleware;
