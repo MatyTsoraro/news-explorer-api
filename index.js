@@ -5,6 +5,7 @@ const mongoose = require('mongoose');
 const userRoutes = require('./routes/userRoutes');
 const articleRoutes = require('./routes/articleRoutes');
 const authRoutes = require('./routes/authRoutes');
+const cors = require('cors');
 
 const index = express();
 
@@ -50,10 +51,15 @@ mongoose.connect('mongodb+srv://matytsoraro:6yGWLKsXhRsC5ls2@cluster0.va69nzn.mo
     console.error('Error connecting to MongoDB:', error);
   });
 
+// Enable CORS for all routes
+index.use(cors());
+
 // Routes
 index.use('/users', userRoutes);
 index.use('/articles', articleRoutes);
 index.use('/auth', authRoutes);
+
+
 
 index.listen(process.env.PORT || 3000, () => {
   console.log('Server started on port 3000');
