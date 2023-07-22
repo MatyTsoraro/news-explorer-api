@@ -1,7 +1,8 @@
 const jwt = require('jsonwebtoken');
+const User = require('../models/user'); // Replace with the actual path to your User model
 require('dotenv').config();
 
-const authMiddleware = (req, res, next) => {
+const authMiddleware = async (req, res, next) => {
   // Check if token exists in the request header
   const authHeader = req.headers['authorization'];
 
@@ -17,8 +18,15 @@ const authMiddleware = (req, res, next) => {
     // Verify and decode the token using the jwtSecret
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    // Add the decoded user information to the request object
-    req.user = decoded.user;
+    // Find the user with the ID from the token
+    const user = await User.findById(decoded.userId);
+
+    if (!user) {
+      return res.status(401).json({ error: 'User not found' });
+    }
+
+    // Attach the user to the request object
+    req.user = user;
 
     // Proceed to the next middleware or route handler
     next();
@@ -27,6 +35,5 @@ const authMiddleware = (req, res, next) => {
     res.status(401).json({ error: 'Unauthorized' });
   }
 };
-
 
 module.exports = authMiddleware;

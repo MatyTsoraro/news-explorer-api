@@ -8,10 +8,18 @@ const authRoutes = require('./routes/authRoutes');
 
 const index = express();
 
+// Create a stream object with a 'write' function
+const winstonStream = {
+  write: (message) => {
+    errorLogger.info(message.substring(0, message.lastIndexOf('\n')));
+  },
+};
+
+// Middleware to parse JSON in request bodies
+index.use(express.json());
+
 // Logging middleware
-index.use(morgan('combined', {
-  stream: createLogger({ transports: [new transports.File({ filename: './logs/request.log' })] }).stream,
-}));
+index.use(morgan('combined', { stream: winstonStream }));
 
 // Error logging
 const errorLogger = createLogger({
@@ -41,9 +49,6 @@ mongoose.connect('mongodb+srv://matytsoraro:6yGWLKsXhRsC5ls2@cluster0.va69nzn.mo
   .catch((error) => {
     console.error('Error connecting to MongoDB:', error);
   });
-
-// Middleware to parse JSON in request bodies
-index.use(express.json());
 
 // Routes
 index.use('/users', userRoutes);
