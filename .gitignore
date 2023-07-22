@@ -15,3 +15,5 @@ node_modules/
 # WebStorm specific files and directories
 .idea/
 *.iml
+
+.vercel
