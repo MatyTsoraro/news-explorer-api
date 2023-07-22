@@ -55,6 +55,6 @@ index.use('/users', userRoutes);
 index.use('/articles', articleRoutes);
 index.use('/auth', authRoutes);
 
-index.listen(3000, () => {
+index.listen(process.env.PORT || 3000, () => {
   console.log('Server started on port 3000');
 });
