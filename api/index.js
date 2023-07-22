@@ -2,12 +2,12 @@ const express = require('express');
 const morgan = require('morgan');
 const { createLogger, transports, format } = require('winston');
 const mongoose = require('mongoose');
-const userRoutes = require('./routes/userRoutes');
-const articleRoutes = require('./routes/articleRoutes');
-const authRoutes = require('./routes/authRoutes');
+const userRoutes = require('../routes/userRoutes');
+const articleRoutes = require('../routes/articleRoutes');
+const authRoutes = require('../routes/authRoutes');
 const cors = require('cors');
 
-const index = express();
+const app = express();
 
 // Create a stream object with a 'write' function
 const winstonStream = {
@@ -17,10 +17,10 @@ const winstonStream = {
 };
 
 // Middleware to parse JSON in request bodies
-index.use(express.json());
+app.use(express.json());
 
 // Logging middleware
-index.use(morgan('combined', { stream: winstonStream }));
+app.use(morgan('combined', { stream: winstonStream }));
 
 // Error logging
 const errorLogger = createLogger({
@@ -34,7 +34,7 @@ const errorLogger = createLogger({
 });
 
 // Error handling middleware
-index.use((err, req, res, next) => {
+app.use((err, req, res, next) => {
   errorLogger.error(err.stack);
   res.status(500).json({ error: 'Internal Server Error' });
 });
@@ -52,15 +52,12 @@ mongoose.connect('mongodb+srv://matytsoraro:6yGWLKsXhRsC5ls2@cluster0.va69nzn.mo
   });
 
 // Enable CORS for all routes
-index.use(cors());
+app.use(cors());
 
 // Routes
-index.use('/users', userRoutes);
-index.use('/articles', articleRoutes);
-index.use('/auth', authRoutes);
+app.use('/users', userRoutes);
+app.use('/articles', articleRoutes);
+app.use('/auth', authRoutes);
 
-
-
-index.listen(process.env.PORT || 3000, () => {
-  console.log('Server started on port 3000');
-});
+// Export the app as a function
+module.exports = app;
