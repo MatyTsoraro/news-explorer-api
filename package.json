@@ -2,11 +2,11 @@
   "name": "news-explorer-api",
   "version": "1.0.0",
   "description": "",
-  "main": "api/index.js",
+  "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "node api/index.js",
-    "start": "node api/index.js"
+    "dev": "node app.js",
+    "start": "node app.js"
   },
   "repository": {
     "type": "git",

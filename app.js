@@ -2,9 +2,9 @@ const express = require('express');
 const morgan = require('morgan');
 const { createLogger, transports, format } = require('winston');
 const mongoose = require('mongoose');
-const userRoutes = require('../routes/userRoutes');
-const articleRoutes = require('../routes/articleRoutes');
-const authRoutes = require('../routes/authRoutes');
+const userRoutes = require('./routes/userRoutes');
+const articleRoutes = require('./routes/articleRoutes');
+const authRoutes = require('./routes/authRoutes');
 const cors = require('cors');
 
 const app = express();
