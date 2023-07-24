@@ -59,5 +59,12 @@ app.use('/users', userRoutes);
 app.use('/articles', articleRoutes);
 app.use('/auth', authRoutes);
 
-// Export the app as a function
+// Define the port the application will listen on
+const PORT = process.env.PORT || 8080;
+
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
+
+// Export the app as a module
 module.exports = app;
