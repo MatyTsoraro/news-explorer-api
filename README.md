@@ -48,9 +48,11 @@ Remember to include the JWT in the Authorization header (as Bearer token) for th
 
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
-## License
+## Deployed link :
 
-[MIT](https://choosealicense.com/licenses/mit/)
+https://news-explorer-api-8g985.kinsta.app/
+
+
 
 
 
