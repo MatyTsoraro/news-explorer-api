@@ -52,10 +52,6 @@ Pull requests are welcome. For major changes, please open an issue first to disc
 
 [MIT](https://choosealicense.com/licenses/mit/)
 
-## Contact
 
-Maty Tsoraro - maty.tsoraro@gmail.com
 
-Project Link: [https://github.com/MatyTsoraro/news-explorer-api](https://github.com/MatyTsoraro/news-explorer-api)
 
-Deployed Site: https://news-explorer-api-8g985.kinsta.app/
