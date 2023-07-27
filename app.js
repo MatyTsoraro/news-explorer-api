@@ -1,13 +1,24 @@
+require('dotenv').config();
 const express = require('express');
 const morgan = require('morgan');
 const { createLogger, transports, format } = require('winston');
 const mongoose = require('mongoose');
+const cors = require('cors');
 const userRoutes = require('./routes/userRoutes');
 const articleRoutes = require('./routes/articleRoutes');
-const authRoutes = require('./routes/authRoutes');
-const cors = require('cors');
 
 const app = express();
+
+// Error logging
+const errorLogger = createLogger({
+  transports: [
+    new transports.File({ filename: './logs/error.log', level: 'error' }),
+  ],
+  format: format.combine(
+    format.timestamp(),
+    format.json(),
+  ),
+});
 
 // Create a stream object with a 'write' function
 const winstonStream = {
@@ -22,25 +33,11 @@ app.use(express.json());
 // Logging middleware
 app.use(morgan('combined', { stream: winstonStream }));
 
-// Error logging
-const errorLogger = createLogger({
-  transports: [
-    new transports.File({ filename: './logs/error.log', level: 'error' }),
-  ],
-  format: format.combine(
-    format.timestamp(),
-    format.json()
-  ),
-});
-
-// Error handling middleware
-app.use((err, req, res, next) => {
-  errorLogger.error(err.stack);
-  res.status(500).json({ error: 'Internal Server Error' });
-});
+// Use environment variables for MongoDB connection
+const dbUrl = process.env.NODE_ENV === 'production' ? process.env.DB_URL_PROD : process.env.DB_URL_DEV;
 
 // Connect to MongoDB database
-mongoose.connect('mongodb+srv://matytsoraro:6yGWLKsXhRsC5ls2@cluster0.va69nzn.mongodb.net/', {
+mongoose.connect(dbUrl, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 })
@@ -57,10 +54,20 @@ app.use(cors());
 // Routes
 app.use('/users', userRoutes);
 app.use('/articles', articleRoutes);
-app.use('/auth', authRoutes);
+
+// Handler for non-existent routes
+app.use((req, res, next) => {
+  res.status(404).json({ error: 'Route not found' });
+});
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+  errorLogger.error(err.stack);
+  res.status(500).json({ error: 'Internal Server Error' });
+});
 
 // Define the port the application will listen on
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);

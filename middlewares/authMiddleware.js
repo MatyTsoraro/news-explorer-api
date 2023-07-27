@@ -1,3 +1,5 @@
+// middlewares/authMiddleware.js
+
 const jwt = require('jsonwebtoken');
 const User = require('../models/user'); // Replace with the actual path to your User model
 require('dotenv').config();

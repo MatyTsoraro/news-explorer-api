@@ -1,10 +1,14 @@
 // routes/userRoutes.js
 const express = require('express');
-const router = express.Router();
 const authMiddleware = require('../middlewares/authMiddleware');
 const userController = require('../controllers/userController');
+const { signupValidator, signinValidator } = require('../validators/userValidator');
 
-// Protected route: Get user information
+const router = express.Router();
+//user registration
+router.post('/signup', signupValidator, userController.signup);
+//user login
+router.post('/signin', signinValidator, userController.signin);
 router.get('/me', authMiddleware, userController.getUserInfo);
 
 module.exports = router;

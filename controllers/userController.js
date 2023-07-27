@@ -1,14 +1,11 @@
 // controllers/userController.js
-const User = require('../models/user');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const User = require('../models/user');
 
 // User registration
 exports.signup = async (req, res) => {
   try {
-    console.log('req.body:', req.body);
-    console.log('req.body.password:', req.body.password);
-
     const hashedPassword = await bcrypt.hash(req.body.password, 10);
 
     const user = new User({
@@ -17,14 +14,18 @@ exports.signup = async (req, res) => {
       name: req.body.name,
     });
 
-    await user.save();
+    const savedUser = await user.save();
 
-    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1d' });
-
-    res.json({ token });
-
+    // Don't return the token, return user's data except password
+    res.status(201).json({ email: savedUser.email, name: savedUser.name });
   } catch (error) {
     console.error('Error registering user:', error);
+    if (error.name === 'MongoError' && error.code === 11000) {
+      return res.status(409).json({ error: 'Email already exists' });
+    }
+    if (error.name === 'ValidationError') {
+      return res.status(400).json({ error: error.message });
+    }
     res.status(500).json({ error: 'Server error' });
   }
 };
@@ -35,13 +36,12 @@ exports.signin = async (req, res) => {
     const user = await User.findOne({ email: req.body.email }).select('+password');
 
     if (user && await user.comparePassword(req.body.password)) {
-      const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1d' });
+      const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET || 'default_secret', { expiresIn: '1d' });
 
       res.json({ token });
     } else {
       res.status(401).json({ error: 'Email or password is incorrect' });
     }
-
   } catch (error) {
     console.error('Error signing in:', error);
     res.status(500).json({ error: 'Server error' });
@@ -51,12 +51,15 @@ exports.signin = async (req, res) => {
 // Get user information
 exports.getUserInfo = async (req, res) => {
   try {
-    // Retrieve the user information from the request object
-    const { email, name } = req.user;
+    // Retrieve the user information from the database using user's id from the request object
+    const user = await User.findById(req.user._id);
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
 
     // Send the user information in the response
-    res.json({ email, name });
-
+    res.json({ email: user.email, name: user.name });
   } catch (error) {
     console.error('Error getting user information:', error);
     res.status(500).json({ error: 'Server error' });
