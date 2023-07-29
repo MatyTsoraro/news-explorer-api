@@ -1,14 +1,15 @@
-// middlewares/authMiddleware.js
-
 const jwt = require('jsonwebtoken');
 const User = require('../models/user'); // Replace with the actual path to your User model
 require('dotenv').config();
+
+// Provide a default value for JWT_SECRET in case it is not set in the environment variables
+const JWT_SECRET = process.env.JWT_SECRET || 'default_secret_key';
 
 const authMiddleware = async (req, res, next) => {
   // Check if token exists in the request header
   const authHeader = req.headers['authorization'];
 
-  // Check if Authorization header is present and in correct format
+  // Check if Authorization header is present and in the correct format
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
@@ -17,8 +18,8 @@ const authMiddleware = async (req, res, next) => {
   const token = authHeader.split(' ')[1];
 
   try {
-    // Verify and decode the token using the jwtSecret
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    // Verify and decode the token using the JWT_SECRET
+    const decoded = jwt.verify(token, JWT_SECRET);
 
     // Find the user with the ID from the token
     const user = await User.findById(decoded.userId);

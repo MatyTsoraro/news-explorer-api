@@ -6,6 +6,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const userRoutes = require('./routes/userRoutes');
 const articleRoutes = require('./routes/articleRoutes');
+const authRoutes = require('./routes/authRoutes'); // new line
 
 const app = express();
 
@@ -34,7 +35,7 @@ app.use(express.json());
 app.use(morgan('combined', { stream: winstonStream }));
 
 // Use environment variables for MongoDB connection
-const dbUrl = process.env.NODE_ENV === 'production' ? process.env.DB_URL_PROD : process.env.DB_URL_DEV;
+const dbUrl = process.env.NODE_ENV === 'production' ? process.env.DB_URL_PROD : process.env.DB_URL_DEV || 'mongodb://127.0.0.1:27017/test';
 
 // Connect to MongoDB database
 mongoose.connect(dbUrl, {
@@ -52,6 +53,7 @@ mongoose.connect(dbUrl, {
 app.use(cors());
 
 // Routes
+app.use(authRoutes); // added this line
 app.use('/users', userRoutes);
 app.use('/articles', articleRoutes);
 

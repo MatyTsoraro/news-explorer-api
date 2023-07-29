@@ -20,7 +20,7 @@ exports.signup = async (req, res) => {
     res.status(201).json({ email: savedUser.email, name: savedUser.name });
   } catch (error) {
     console.error('Error registering user:', error);
-    if (error.name === 'MongoError' && error.code === 11000) {
+    if (error.name === 'MongoServerError' && error.code === 11000) { // <-- Notice the change here
       return res.status(409).json({ error: 'Email already exists' });
     }
     if (error.name === 'ValidationError') {
@@ -29,6 +29,7 @@ exports.signup = async (req, res) => {
     res.status(500).json({ error: 'Server error' });
   }
 };
+
 
 // User login
 exports.signin = async (req, res) => {
