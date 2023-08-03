@@ -1,4 +1,3 @@
-// schemas/articleSchemas.js
 const Joi = require('joi');
 
 exports.createArticleSchema = Joi.object({

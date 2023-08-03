@@ -1,4 +1,3 @@
-// schemas/userSchemas.js
 const Joi = require('joi');
 
 exports.signupSchema = Joi.object({
