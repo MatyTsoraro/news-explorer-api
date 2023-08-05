@@ -3,7 +3,7 @@ const User = require('../models/user'); // Replace with the actual path to your 
 require('dotenv').config();
 
 // Provide a default value for JWT_SECRET in case it is not set in the environment variables
-const JWT_SECRET = process.env.JWT_SECRET || 'default_secret_key';
+const JWT_SECRET = process.env.JWT_SECRET || 'default_secret';
 
 const authMiddleware = async (req, res, next) => {
   // Check if token exists in the request header

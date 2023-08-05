@@ -1,12 +1,12 @@
-require('dotenv').config();
 const express = require('express');
 const morgan = require('morgan');
 const { createLogger, transports, format } = require('winston');
+const expressWinston = require('express-winston');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const userRoutes = require('./routes/userRoutes');
 const articleRoutes = require('./routes/articleRoutes');
-const authRoutes = require('./routes/authRoutes'); // new line
+const authRoutes = require('./routes/authRoutes');
 
 const app = express();
 
@@ -31,7 +31,19 @@ const winstonStream = {
 // Middleware to parse JSON in request bodies
 app.use(express.json());
 
-// Logging middleware
+// Logging middleware for requests
+app.use(expressWinston.logger({
+  transports: [
+    new transports.File({ filename: './logs/request.log' }),
+  ],
+  format: format.combine(
+    format.timestamp(),
+    format.json(),
+  ),
+  dynamicMeta: (req, res) => ({ user: req.user ? req.user.email : 'anonymous' }),
+}));
+
+// Morgan middleware for additional logging (if needed)
 app.use(morgan('combined', { stream: winstonStream }));
 
 // Use environment variables for MongoDB connection
@@ -53,11 +65,11 @@ mongoose.connect(dbUrl, {
 app.use(cors());
 
 // Routes
-app.use(authRoutes); // added this line
+app.use(authRoutes);
 app.use('/users', userRoutes);
 app.use('/articles', articleRoutes);
 
-// Respond to requests to the root the application
+// Respond to requests to the root of the application
 app.get('/', (req, res) => {
   res.json({ message: 'Welcome to my API!' });
 });
@@ -80,5 +92,4 @@ app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
 
-// Export the app as a module
 module.exports = app;

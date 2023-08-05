@@ -26,17 +26,25 @@ exports.deleteArticle = async (req, res) => {
   try {
     const article = await Article.findOne({
       _id: req.params.articleId,
-      owner: req.user._id, // Make sure to check for the owner field as well
-    });
+    }).select('+owner');
 
     if (!article) {
       return res.status(404).json({ error: 'Article not found' });
     }
 
-    await Article.deleteOne({ _id: req.params.articleId, owner: req.user._id }); // Use deleteOne method with owner check
+    // Check if the authenticated user is the owner of the article
+    if (article.owner.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ error: 'Forbidden: You are not allowed to delete this article' });
+    }
+
+    // If the user is the owner, then proceed with the deletion
+    await Article.deleteOne({ _id: req.params.articleId });
+
     return res.json({ message: 'Article deleted successfully' });
   } catch (error) {
     console.error('Error deleting article:', error);
     return res.status(500).json({ error: 'Server error' });
   }
 };
+
+
