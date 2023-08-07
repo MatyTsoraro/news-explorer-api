@@ -7,7 +7,7 @@ const JWT_SECRET = process.env.JWT_SECRET || 'default_secret';
 
 const authMiddleware = async (req, res, next) => {
   // Check if token exists in the request header
-  const authHeader = req.headers['authorization'];
+  const authHeader = req.headers.authorization;
 
   // Check if Authorization header is present and in the correct format
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -33,9 +33,13 @@ const authMiddleware = async (req, res, next) => {
 
     // Proceed to the next middleware or route handler
     next();
+    // Add an explicit return statement
+    return null;
   } catch (error) {
     console.error('Error authenticating token:', error);
     res.status(401).json({ error: 'Unauthorized' });
+    // Add an explicit return statement
+    return null;
   }
 };
 

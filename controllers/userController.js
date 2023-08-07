@@ -1,4 +1,3 @@
-// controllers/userController.js
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
@@ -17,19 +16,18 @@ exports.signup = async (req, res) => {
     const savedUser = await user.save();
 
     // Don't return the token, return user's data except password
-    res.status(201).json({ email: savedUser.email, name: savedUser.name });
+    return res.status(201).json({ email: savedUser.email, name: savedUser.name });
   } catch (error) {
     console.error('Error registering user:', error);
-    if (error.name === 'MongoServerError' && error.code === 11000) { // <-- Notice the change here
+    if (error.name === 'MongoServerError' && error.code === 11000) {
       return res.status(409).json({ error: 'Email already exists' });
     }
     if (error.name === 'ValidationError') {
       return res.status(400).json({ error: error.message });
     }
-    res.status(500).json({ error: 'Server error' });
+    return res.status(500).json({ error: 'Server error' });
   }
 };
-
 
 // User login
 exports.signin = async (req, res) => {
@@ -39,13 +37,13 @@ exports.signin = async (req, res) => {
     if (user && await user.comparePassword(req.body.password)) {
       const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET || 'default_secret', { expiresIn: '1d' });
 
-      res.json({ token });
-    } else {
-      res.status(401).json({ error: 'Email or password is incorrect' });
+      return res.json({ token });
     }
+
+    return res.status(401).json({ error: 'Email or password is incorrect' });
   } catch (error) {
     console.error('Error signing in:', error);
-    res.status(500).json({ error: 'Server error' });
+    return res.status(500).json({ error: 'Server error' });
   }
 };
 
@@ -60,9 +58,9 @@ exports.getUserInfo = async (req, res) => {
     }
 
     // Send the user information in the response
-    res.json({ email: user.email, name: user.name });
+    return res.json({ email: user.email, name: user.name });
   } catch (error) {
     console.error('Error getting user information:', error);
-    res.status(500).json({ error: 'Server error' });
+    return res.status(500).json({ error: 'Server error' });
   }
 };

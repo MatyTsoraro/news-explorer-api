@@ -9,6 +9,8 @@ exports.createArticleValidator = (req, res, next) => {
   }
 
   next();
+  // Add an explicit return statement
+  return null;
 };
 
 exports.deleteArticleValidator = (req, res, next) => {
@@ -19,4 +21,6 @@ exports.deleteArticleValidator = (req, res, next) => {
   }
 
   next();
+  // Add an explicit return statement
+  return null;
 };

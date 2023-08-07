@@ -40,7 +40,7 @@ app.use(expressWinston.logger({
     format.timestamp(),
     format.json(),
   ),
-  dynamicMeta: (req, res) => ({ user: req.user ? req.user.email : 'anonymous' }),
+  dynamicMeta: (req) => ({ user: req.user ? req.user.email : 'anonymous' }),
 }));
 
 // Morgan middleware for additional logging (if needed)
@@ -75,12 +75,12 @@ app.get('/', (req, res) => {
 });
 
 // Handler for non-existent routes
-app.use((req, res, next) => {
+app.use((req, res) => {
   res.status(404).json({ error: 'Route not found' });
 });
 
 // Error handling middleware
-app.use((err, req, res, next) => {
+app.use((err, req, res) => {
   errorLogger.error(err.stack);
   res.status(500).json({ error: 'Internal Server Error' });
 });

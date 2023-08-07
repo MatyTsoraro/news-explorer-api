@@ -3,9 +3,9 @@ const Article = require('../models/article');
 exports.getAllArticles = async (req, res) => {
   try {
     const articles = await Article.find({ owner: req.user.id });
-    res.json(articles);
+    return res.json(articles);
   } catch (error) {
-    res.status(500).json({ error: 'Server error' });
+    return res.status(500).json({ error: 'Server error' });
   }
 };
 
@@ -13,12 +13,12 @@ exports.createArticle = async (req, res) => {
   try {
     const article = new Article({ ...req.body, owner: req.user.id });
     await article.save();
-    res.status(201).json(article);
+    return res.status(201).json(article);
   } catch (error) {
     if (error.name === 'ValidationError') {
       return res.status(400).json({ error: error.message });
     }
-    res.status(500).json({ error: 'Server error' });
+    return res.status(500).json({ error: 'Server error' });
   }
 };
 
@@ -46,5 +46,3 @@ exports.deleteArticle = async (req, res) => {
     return res.status(500).json({ error: 'Server error' });
   }
 };
-
-
