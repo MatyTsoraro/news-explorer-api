@@ -50,47 +50,46 @@ app.use(morgan('combined', { stream: winstonStream }));
 const dbUrl = process.env.NODE_ENV === 'production' ? process.env.DB_URL_PROD : process.env.DB_URL_DEV || 'mongodb://127.0.0.1:27017/test';
 
 // Connect to MongoDB database
-(async () => {
-  try {
-    await mongoose.connect(dbUrl, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
+mongoose.connect(dbUrl, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+})
+  .then(() => {
     console.log('Connected to MongoDB');
-
-    // Enable CORS for all routes
-    app.use(cors());
-
-    // Routes
-    app.use(authRoutes);
-    app.use('/users', userRoutes);
-    app.use('/articles', articleRoutes);
-
-    // Respond to requests to the root of the application
-    app.get('/', (req, res) => {
-      res.json({ message: 'Welcome to my API!' });
-    });
-
-    // Handler for non-existent routes
-    app.use((req, res) => {
-      res.status(404).json({ error: 'Route not found' });
-    });
-
-    // Error handling middleware
-    app.use((err, req, res) => {
-      errorLogger.error(err.stack);
-      res.status(500).json({ error: 'Internal Server Error' });
-    });
-
-    // Define the port the application will listen on
-    const PORT = process.env.PORT || 3000;
-
-    app.listen(PORT, () => {
-      console.log(`Server is running on port ${PORT}`);
-    });
-  } catch (error) {
+  })
+  .catch((error) => {
     console.error('Error connecting to MongoDB:', error);
-  }
-})();
+  });
+
+// Enable CORS for all routes
+app.use(cors());
+
+// Routes
+app.use(authRoutes);
+app.use('/users', userRoutes);
+app.use('/articles', articleRoutes);
+
+// Respond to requests to the root of the application
+app.get('/', (req, res) => {
+  res.json({ message: 'Welcome to my API!' });
+});
+
+// Handler for non-existent routes
+app.use((req, res) => {
+  res.status(404).json({ error: 'Route not found' });
+});
+
+// Error handling middleware
+app.use((err, req, res) => {
+  errorLogger.error(err.stack);
+  res.status(500).json({ error: 'Internal Server Error' });
+});
+
+// Define the port the application will listen on
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
 
 module.exports = app;
