@@ -41,7 +41,6 @@ const dbUrl = process.env.NODE_ENV === 'production' ? process.env.DB_URL_PROD : 
 mongoose.connect(dbUrl, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
-  useCreateIndex:true,
   family:4,
 })
   .then(() => {
