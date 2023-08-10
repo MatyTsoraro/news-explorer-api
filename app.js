@@ -1,55 +1,22 @@
 const express = require('express');
-const morgan = require('morgan');
-const { createLogger, transports, format } = require('winston');
-const expressWinston = require('express-winston');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const { requestLogger, errorLogger } = require('./logger');
 const userRoutes = require('./routes/userRoutes');
 const articleRoutes = require('./routes/articleRoutes');
 const authRoutes = require('./routes/authRoutes');
 
 const app = express();
 
-// Error logging
-const errorLogger = createLogger({
-  transports: [
-    new transports.File({ filename: './logs/error.log', level: 'error' }),
-  ],
-  format: format.combine(
-    format.timestamp(),
-    format.json(),
-  ),
-});
-
-// Create a stream object with a 'write' function
-const winstonStream = {
-  write: (message) => {
-    errorLogger.info(message.substring(0, message.lastIndexOf('\n')));
-  },
-};
-
 // Middleware to parse JSON in request bodies
 app.use(express.json());
 
-// Logging middleware for requests
-app.use(expressWinston.logger({
-  transports: [
-    new transports.File({ filename: './logs/request.log' }),
-  ],
-  format: format.combine(
-    format.timestamp(),
-    format.json(),
-  ),
-  dynamicMeta: (req) => ({ user: req.user ? req.user.email : 'anonymous' }),
-}));
-
-// Morgan middleware for additional logging (if needed)
-app.use(morgan('combined', { stream: winstonStream }));
-
-// Use environment variables for MongoDB connection
-const dbUrl = process.env.NODE_ENV === 'production' ? process.env.DB_URL_PROD : process.env.DB_URL_DEV || 'mongodb://127.0.0.1:27017/test';
+// Request logger middleware
+app.use(requestLogger);
 
 // Connect to MongoDB database
+const dbUrl = process.env.NODE_ENV === 'production' ? process.env.DB_URL_PROD : process.env.DB_URL_DEV || 'mongodb://127.0.0.1:27017/test';
+
 mongoose.connect(dbUrl, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -79,9 +46,12 @@ app.use((req, res) => {
   res.status(404).json({ error: 'Route not found' });
 });
 
+// Error logger middleware
+app.use(errorLogger);
+
 // Error handling middleware
 app.use((err, req, res) => {
-  errorLogger.error(err.stack);
+  errorLogger.error(err); // Log the error
   res.status(500).json({ error: 'Internal Server Error' });
 });
 

@@ -9,7 +9,7 @@ exports.createArticleSchema = Joi.object({
   date: Joi.string().required(),
   source: Joi.string().required(),
   link: Joi.string().pattern(urlRegex).required(),
-  image: Joi.string().uri().required(),
+  image: Joi.string().pattern(urlRegex).required(),
 });
 
 exports.deleteArticleSchema = Joi.object({
