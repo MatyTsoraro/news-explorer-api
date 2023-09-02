@@ -9,6 +9,8 @@ exports.signupValidator = (req, res, next) => {
   }
 
   next();
+  // Add an explicit return statement
+  return null;
 };
 
 exports.signinValidator = (req, res, next) => {
@@ -19,4 +21,6 @@ exports.signinValidator = (req, res, next) => {
   }
 
   next();
+  // Add an explicit return statement
+  return null;
 };

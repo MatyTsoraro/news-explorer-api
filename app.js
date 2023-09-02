@@ -1,42 +1,22 @@
-require('dotenv').config();
 const express = require('express');
-const morgan = require('morgan');
-const { createLogger, transports, format } = require('winston');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const { requestLogger, errorLogger } = require('./logger');
 const userRoutes = require('./routes/userRoutes');
 const articleRoutes = require('./routes/articleRoutes');
+const authRoutes = require('./routes/authRoutes');
 
 const app = express();
-
-// Error logging
-const errorLogger = createLogger({
-  transports: [
-    new transports.File({ filename: './logs/error.log', level: 'error' }),
-  ],
-  format: format.combine(
-    format.timestamp(),
-    format.json(),
-  ),
-});
-
-// Create a stream object with a 'write' function
-const winstonStream = {
-  write: (message) => {
-    errorLogger.info(message.substring(0, message.lastIndexOf('\n')));
-  },
-};
 
 // Middleware to parse JSON in request bodies
 app.use(express.json());
 
-// Logging middleware
-app.use(morgan('combined', { stream: winstonStream }));
-
-// Use environment variables for MongoDB connection
-const dbUrl = process.env.NODE_ENV === 'production' ? process.env.DB_URL_PROD : process.env.DB_URL_DEV;
+// Request logger middleware
+app.use(requestLogger);
 
 // Connect to MongoDB database
+const dbUrl = process.env.NODE_ENV === 'production' ? process.env.DB_URL_PROD : process.env.DB_URL_DEV || 'mongodb://127.0.0.1:27017/test';
+
 mongoose.connect(dbUrl, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -52,22 +32,26 @@ mongoose.connect(dbUrl, {
 app.use(cors());
 
 // Routes
+app.use(authRoutes);
 app.use('/users', userRoutes);
 app.use('/articles', articleRoutes);
 
-// Respond to requests to the root the application
+// Respond to requests to the root of the application
 app.get('/', (req, res) => {
   res.json({ message: 'Welcome to my API!' });
 });
 
 // Handler for non-existent routes
-app.use((req, res, next) => {
+app.use((req, res) => {
   res.status(404).json({ error: 'Route not found' });
 });
 
+// Error logger middleware
+app.use(errorLogger);
+
 // Error handling middleware
-app.use((err, req, res, next) => {
-  errorLogger.error(err.stack);
+app.use((err, req, res) => {
+  errorLogger.error(err); // Log the error
   res.status(500).json({ error: 'Internal Server Error' });
 });
 
@@ -78,5 +62,4 @@ app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
 
-// Export the app as a module
 module.exports = app;

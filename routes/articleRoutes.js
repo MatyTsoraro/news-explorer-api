@@ -1,17 +1,12 @@
-// routes/articleRoutes.js
 const express = require('express');
-
-const router = express.Router();
 const authMiddleware = require('../middlewares/authMiddleware');
 const articleController = require('../controllers/articleController');
+const { createArticleValidator, deleteArticleValidator } = require('../validators/articleValidator');
 
-// Protected route: Get all articles saved by the user
+const router = express.Router();
+
 router.get('/', authMiddleware, articleController.getAllArticles);
-
-// Protected route: Create a new article
-router.post('/', authMiddleware, articleController.createArticle);
-
-// Protected route: Delete an article by ID
-router.delete('/:articleId', authMiddleware, articleController.deleteArticle);
+router.post('/', authMiddleware, createArticleValidator, articleController.createArticle);
+router.delete('/:articleId', authMiddleware, deleteArticleValidator, articleController.deleteArticle);
 
 module.exports = router;
