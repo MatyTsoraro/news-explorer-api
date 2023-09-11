@@ -3,6 +3,7 @@ const Article = require('../models/article');
 exports.getAllArticles = async (req, res) => {
   try {
     const articles = await Article.find({ owner: req.user.id });
+    console.log("Complete API Response for getAllArticles:", articles);
     return res.json(articles);
   } catch (error) {
     return res.status(500).json({ error: 'Server error' });
@@ -13,6 +14,7 @@ exports.createArticle = async (req, res) => {
   try {
     const article = new Article({ ...req.body, owner: req.user.id });
     await article.save();
+    console.log("Complete API Response for createArticle:", article);
     return res.status(201).json(article);
   } catch (error) {
     if (error.name === 'ValidationError') {
